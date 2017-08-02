@@ -32,7 +32,7 @@ ZCounting::ZCounting(const edm::ParameterSet& iConfig):
   EleID_( ElectronIdentifier(iConfig))
 {
   edm::LogInfo("ZCounting") <<  "Constructor  ZCounting::ZCounting " << std::endl;
-  
+ 
   //Get parameters from configuration file
   fHLTTag_token    = consumes<edm::TriggerResults>(fHLTTag);
   fHLTObjTag_token = consumes<trigger::TriggerEvent>(fHLTObjTag);
@@ -57,7 +57,7 @@ ZCounting::ZCounting(const edm::ParameterSet& iConfig):
   else if(IDTypestr_ == "Tight")  IDType_ = TightID;
   else                            IDType_ = NoneID;
 
-  if     (IsoTypestr_ == "Tracker-based") IsoType_ = TrackerIso; 
+  if     (IsoTypestr_ == "Tracker-based") IsoType_ = TrackerIso;
   else if(IsoTypestr_ == "PF-based")      IsoType_ = PFIso;
   else                                    IsoType_ = NoneIso;
 
@@ -101,7 +101,7 @@ void ZCounting::dqmBeginRun(edm::Run const &, edm::EventSetup const &)
 
   // Triggers
   fTrigger.reset(new ZCountingTrigger::TTrigger());
-  
+ 
 }
 //
 // -------------------------------------- bookHistos --------------------------------------------
@@ -145,7 +145,7 @@ void ZCounting::bookHistograms(DQMStore::IBooker & ibooker_, edm::Run const &, e
 //
 // -------------------------------------- beginLuminosityBlock --------------------------------------------
 //
-void ZCounting::beginLuminosityBlock(edm::LuminosityBlock const& lumiSeg, edm::EventSetup const& context) 
+void ZCounting::beginLuminosityBlock(edm::LuminosityBlock const& lumiSeg, edm::EventSetup const& context)
 {
   edm::LogInfo("ZCounting") <<  "ZCounting::beginLuminosityBlock" << std::endl;
 }
@@ -156,7 +156,7 @@ void ZCounting::beginLuminosityBlock(edm::LuminosityBlock const& lumiSeg, edm::E
 //
 //--------------------------------------------------------------------------------------------------
 void ZCounting::analyze(const edm::Event& iEvent, const edm::EventSetup& iSetup)
-{// Fill event tree on the fly 
+{// Fill event tree on the fly
   edm::LogInfo("ZCounting") <<  "ZCounting::analyze" << std::endl;
   analyzeMuons(iEvent, iSetup);
   analyzeElectrons(iEvent, iSetup);
@@ -164,7 +164,7 @@ void ZCounting::analyze(const edm::Event& iEvent, const edm::EventSetup& iSetup)
 
 void ZCounting::analyzeMuons(const edm::Event& iEvent, const edm::EventSetup& iSetup) {
   //-------------------------------
-  //--- Vertex 
+  //--- Vertex
   //-------------------------------
   edm::Handle<reco::VertexCollection> hVertexProduct;
   iEvent.getByToken(fPVName_token,hVertexProduct);
@@ -173,7 +173,7 @@ void ZCounting::analyzeMuons(const edm::Event& iEvent, const edm::EventSetup& iS
   const reco::VertexCollection *pvCol = hVertexProduct.product();
   const reco::Vertex* pv = &(*pvCol->begin());
   int nvtx = 0;
- 
+
   for(auto const & itVtx : *hVertexProduct) {
     if(itVtx.isFake())                             continue;
     if(itVtx.tracksSize()     < VtxNTracksFitCut_) continue;
@@ -193,7 +193,7 @@ void ZCounting::analyzeMuons(const edm::Event& iEvent, const edm::EventSetup& iS
   if(nvtx==0) return;
 
   //-------------------------------
-  //--- Trigger 
+  //--- Trigger
   //-------------------------------
   edm::Handle<edm::TriggerResults> hTrgRes;
   iEvent.getByToken(fHLTTag_token,hTrgRes);
@@ -225,7 +225,7 @@ void ZCounting::analyzeMuons(const edm::Event& iEvent, const edm::EventSetup& iS
   if(!isMuonTrigger(*fTrigger, triggerBits)) return;
 
   //-------------------------------
-  //--- Muons and Tracks 
+  //--- Muons and Tracks
   //-------------------------------
   edm::Handle<reco::MuonCollection> hMuonProduct;
   iEvent.getByToken(fMuonName_token,hMuonProduct);
@@ -287,7 +287,7 @@ void ZCounting::analyzeMuons(const edm::Event& iEvent, const edm::EventSetup& iS
           // category 2HLT: both muons passing trigger requirements
           if(&itMu1>&itMu2) continue;  // make sure we don't double count MuMu2HLT category
 
-          // Fill twice for each event, since both muons pass trigger 
+          // Fill twice for each event, since both muons pass trigger
           if(isTagCentral){
             h_mass_HLT_pass_central->Fill(iEvent.luminosityBlock(), dilepMass);
             h_mass_SIT_pass_central->Fill(iEvent.luminosityBlock(), dilepMass);
@@ -328,11 +328,11 @@ void ZCounting::analyzeMuons(const edm::Event& iEvent, const edm::EventSetup& iS
           }
 
         }
-        // category 2HLT + 1HLT: Fill once for Z yield 
+        // category 2HLT + 1HLT: Fill once for Z yield
         h_yield_Z->Fill(iEvent.luminosityBlock());
       }
       else if(itMu2.isGlobalMuon()){
-        // category NoSel: probe is a GLB muon but failing selection 
+        // category NoSel: probe is a GLB muon but failing selection
         if(isProbeCentral){
           h_mass_SIT_fail_central->Fill(iEvent.luminosityBlock(), dilepMass);
           h_mass_Sta_pass_central->Fill(iEvent.luminosityBlock(), dilepMass);
