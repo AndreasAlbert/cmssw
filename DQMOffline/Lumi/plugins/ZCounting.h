@@ -25,6 +25,7 @@
 #include "DQMOffline/Lumi/interface/TriggerDefs.h"
 #include "DQMOffline/Lumi/interface/TTrigger.h"
 #include "DQMOffline/Lumi/interface/TriggerTools.h"
+#include "DQMOffline/Lumi/interface/ElectronIdentifier.h"
 
 class TFile;
 class TH1D;
@@ -84,6 +85,25 @@ private:
   std::string fTrackName;
   edm::EDGetTokenT<reco::TrackCollection> fTrackName_token;
 
+  // Electrons
+  std::string fElectronName;
+  edm::EDGetTokenT<edm::View<reco::GsfElectron>> fGsfElectronName_token;
+  std::string fSCName;
+  edm::EDGetTokenT<edm::View<reco::SuperCluster>> fSCName_token;
+
+
+
+  edm::InputTag fRhoTag;
+  edm::EDGetTokenT<double> fRhoToken;
+
+  edm::InputTag fBeamspotTag;
+  edm::EDGetTokenT<reco::BeamSpot> fBeamspotToken;
+
+  edm::InputTag fConversionTag;
+  edm::EDGetTokenT<reco::ConversionCollection> fConversionToken;
+
+
+
   // bacon fillers
   std::unique_ptr<ZCountingTrigger::TTrigger> fTrigger;
 
@@ -117,6 +137,10 @@ private:
 
   const double MUON_MASS  = 0.105658369;
   const double MUON_BOUND = 0.9;
+
+  // Electron-specific members
+  ElectronIdentifier EleID_;
+
 
   // Muon Histograms
   MonitorElement* h_mass_HLT_pass_central;
