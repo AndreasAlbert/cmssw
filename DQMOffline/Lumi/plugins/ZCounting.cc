@@ -27,7 +27,9 @@ ZCounting::ZCounting(const edm::ParameterSet& iConfig):
   fHLTTag            (iConfig.getParameter<edm::InputTag>("TriggerResults")),
   fPVName            (iConfig.getUntrackedParameter<std::string>("edmPVName","offlinePrimaryVertices")),
   fMuonName          (iConfig.getUntrackedParameter<std::string>("edmName","muons")),
-  fTrackName         (iConfig.getUntrackedParameter<std::string>("edmTrackName","generalTracks"))
+  fTrackName         (iConfig.getUntrackedParameter<std::string>("edmTrackName","generalTracks")),
+
+  EleID_( ElectronIdentifier(iConfig))
 {
   edm::LogInfo("ZCounting") <<  "Constructor  ZCounting::ZCounting " << std::endl;
   
@@ -37,6 +39,13 @@ ZCounting::ZCounting(const edm::ParameterSet& iConfig):
   fPVName_token    = consumes<reco::VertexCollection>(fPVName);
   fMuonName_token  = consumes<reco::MuonCollection>(fMuonName);
   fTrackName_token = consumes<reco::TrackCollection>(fTrackName);
+
+  // Electron-specific parameters
+  fGsfElectronName_token  = consumes<edm::View<reco::GsfElectron>>(fElectronName);
+  fSCName_token           = consumes<edm::View<reco::SuperCluster>>(fSCName);
+  fRhoToken               = consumes<double>(fRhoTag);
+  fBeamspotToken          = consumes<reco::BeamSpot>(fBeamspotTag);
+  fConversionToken        = consumes<reco::ConversionCollection>(fConversionTag);
 
   //Cuts
   IDTypestr_       = iConfig.getUntrackedParameter<std::string>("IDType");
@@ -459,6 +468,29 @@ void ZCounting::analyzeElectrons(const edm::Event& iEvent, const edm::EventSetup
 
   // Trigger requirement
   if(!isElectronTrigger(*fTrigger, triggerBits)) return;
+
+  // Get Electrons
+  edm::Handle<edm::View<reco::GsfElectron> > electrons;
+  iEvent.getByToken(fGsfElectronName_token, electrons);
+
+  // Get SuperClusters
+  edm::Handle<edm::View<reco::SuperCluster> > superclusters;
+  iEvent.getByToken(fSCName_token, superclusters);
+
+  // Get Rho
+  edm::Handle<double> rhoHandle;
+  iEvent.getByToken(fRhoToken, rhoHandle);
+  EleID_.setRho(*rhoHandle);
+
+  // Get beamspot
+  edm::Handle<reco::BeamSpot> beamspotHandle;
+  iEvent.getByToken(fBeamspotToken, beamspotHandle);
+  EleID_.setBeamspot(beamspotHandle);
+
+  // Conversions
+  edm::Handle<reco::ConversionCollection> conversionsHandle;
+  iEvent.getByToken(fConversionToken, conversionsHandle);
+  EleID_.setConversions(conversionsHandle);
 }
 //
 // -------------------------------------- endLuminosityBlock --------------------------------------------
