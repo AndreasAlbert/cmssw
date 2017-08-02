@@ -104,6 +104,8 @@ void ZCounting::bookHistograms(DQMStore::IBooker & ibooker_, edm::Run const &, e
   ibooker_.cd();
   ibooker_.setCurrentFolder("ZCounting/Histograms");
 
+
+  // Muon histograms
   h_mass_HLT_pass_central = ibooker_.book2D("h_mass_HLT_pass_central", "h_mass_HLT_pass_central", LumiBin_, LumiMin_, LumiMax_, MassBin_, MassMin_, MassMax_);
   h_mass_HLT_pass_forward = ibooker_.book2D("h_mass_HLT_pass_forward", "h_mass_HLT_pass_forward", LumiBin_, LumiMin_, LumiMax_, MassBin_, MassMin_, MassMax_);
   h_mass_HLT_fail_central = ibooker_.book2D("h_mass_HLT_fail_central", "h_mass_HLT_fail_central", LumiBin_, LumiMin_, LumiMax_, MassBin_, MassMin_, MassMax_);
@@ -122,6 +124,14 @@ void ZCounting::bookHistograms(DQMStore::IBooker & ibooker_, edm::Run const &, e
   h_npv                   = ibooker_.book2D("h_npv",     "h_npv",     LumiBin_, LumiMin_, LumiMax_, PVBin_, PVMin_, PVMax_);
   h_yield_Z               = ibooker_.book1D("h_yield_Z", "h_yield_Z", LumiBin_, LumiMin_, LumiMax_);
 
+
+  // Electron histograms
+  h_ee_mass_id_pass = ibooker_.book2D("h_ee_mass_id_pass", "h_ee_mass_id_pass", LumiBin_, LumiMin_, LumiMax_, MassBin_, MassMin_, MassMax_);
+  h_ee_mass_id_fail = ibooker_.book2D("h_ee_mass_id_fail", "h_ee_mass_id_fail", LumiBin_, LumiMin_, LumiMax_, MassBin_, MassMin_, MassMax_);
+
+  h_ee_mass_HLT_pass = ibooker_.book2D("h_ee_mass_HLT_pass", "h_ee_mass_HLT_pass", LumiBin_, LumiMin_, LumiMax_, MassBin_, MassMin_, MassMax_);
+  h_ee_mass_HLT_fail = ibooker_.book2D("h_ee_mass_HLT_fail", "h_ee_mass_HLT_fail", LumiBin_, LumiMin_, LumiMax_, MassBin_, MassMin_, MassMax_);
+  h_ee_yield_Z     = ibooker_.book1D("h_yield_Zee", "h_yield_Zee", LumiBin_, LumiMin_, LumiMax_);
 }
 //
 // -------------------------------------- beginLuminosityBlock --------------------------------------------
@@ -139,7 +149,11 @@ void ZCounting::beginLuminosityBlock(edm::LuminosityBlock const& lumiSeg, edm::E
 void ZCounting::analyze(const edm::Event& iEvent, const edm::EventSetup& iSetup)
 {// Fill event tree on the fly 
   edm::LogInfo("ZCounting") <<  "ZCounting::analyze" << std::endl;
+  analyzeMuons(iEvent, iSetup);
+  analyzeElectrons(iEvent, iSetup);
+}
 
+void ZCounting::analyzeMuons(const edm::Event& iEvent, const edm::EventSetup& iSetup) {
   //-------------------------------
   //--- Vertex 
   //-------------------------------
@@ -385,7 +399,9 @@ void ZCounting::analyze(const edm::Event& iEvent, const edm::EventSetup& iSetup)
   }//End of tag loop
 
 }
-
+void ZCounting::analyzeElectrons(const edm::Event& iEvent, const edm::EventSetup& iSetup) {
+  edm::LogInfo("ZCounting") <<  "ZCounting::analyze_electrons" << std::endl;
+}
 //
 // -------------------------------------- endLuminosityBlock --------------------------------------------
 //
