@@ -401,6 +401,64 @@ void ZCounting::analyzeMuons(const edm::Event& iEvent, const edm::EventSetup& iS
 }
 void ZCounting::analyzeElectrons(const edm::Event& iEvent, const edm::EventSetup& iSetup) {
   edm::LogInfo("ZCounting") <<  "ZCounting::analyze_electrons" << std::endl;
+
+  //-------------------------------
+  //--- Vertex
+  //-------------------------------
+  edm::Handle<reco::VertexCollection> hVertexProduct;
+  iEvent.getByToken(fPVName_token,hVertexProduct);
+  if(!hVertexProduct.isValid()) return;
+
+  const reco::VertexCollection *pvCol = hVertexProduct.product();
+  //~ const reco::Vertex* pv = &(*pvCol->begin());
+  int nvtx = 0;
+
+  for(reco::VertexCollection::const_iterator itVtx = pvCol->begin(); itVtx!=pvCol->end(); ++itVtx) {
+    if(itVtx->isFake())                             continue;
+    if(itVtx->tracksSize()     < VtxNTracksFitCut_) continue;
+    if(itVtx->ndof()           < VtxNdofCut_)       continue;
+    if(fabs(itVtx->z())        > VtxAbsZCut_)       continue;
+    if(itVtx->position().Rho() > VtxRhoCut_)        continue;
+
+    nvtx++;
+  }
+
+  h_npv->Fill(iEvent.luminosityBlock(), nvtx);
+
+  // Good vertex requirement
+  if(nvtx==0) return;
+
+  //-------------------------------
+  //--- Trigger
+  //-------------------------------
+  edm::Handle<edm::TriggerResults> hTrgRes;
+  iEvent.getByToken(fHLTTag_token,hTrgRes);
+  if(!hTrgRes.isValid()) return;
+
+  edm::Handle<trigger::TriggerEvent> hTrgEvt;
+  iEvent.getByToken(fHLTObjTag_token,hTrgEvt);
+
+
+  const edm::TriggerNames &triggerNames = iEvent.triggerNames(*hTrgRes);
+  Bool_t config_changed = false;
+  if(fTriggerNamesID != triggerNames.parameterSetID()) {
+    fTriggerNamesID = triggerNames.parameterSetID();
+    config_changed  = true;
+  }
+  if(config_changed) {
+    initHLT(*hTrgRes, triggerNames);
+  }
+
+  TriggerBits triggerBits;
+  for(unsigned int irec=0; irec<fTrigger->fRecords.size(); irec++) {
+    if(fTrigger->fRecords[irec].hltPathIndex == (unsigned int)-1) continue;
+    if(hTrgRes->accept(fTrigger->fRecords[irec].hltPathIndex)) {
+      triggerBits [fTrigger->fRecords[irec].baconTrigBit] = 1;
+    }
+  }
+
+  // Trigger requirement
+  if(!isElectronTrigger(*fTrigger, triggerBits)) return;
 }
 //
 // -------------------------------------- endLuminosityBlock --------------------------------------------
@@ -451,6 +509,7 @@ bool ZCounting::isMuonTriggerObj(const ZCountingTrigger::TTrigger &triggerMenu, 
 {
   return triggerMenu.passObj("HLT_IsoMu27_v*","hltL3crIsoL1sMu22Or25L1f0L2f10QL3f27QL3trkIsoFiltered0p07",hltMatchBits);
 }
+
 //--------------------------------------------------------------------------------------------------
 bool ZCounting::passMuonID(const reco::Muon& muon, const reco::Vertex& vtx, const MuonIDTypes &idType)
 {//Muon ID selection, using internal function "DataFormats/MuonReco/src/MuonSelectors.cc
@@ -471,4 +530,14 @@ bool ZCounting::passMuonIso(const reco::Muon& muon, const MuonIsoTypes &isoType,
     else                        return false;
 }
 
+//--------------------------------------------------------------------------------------------------
+bool ZCounting::isElectronTrigger(ZCountingTrigger::TTrigger triggerMenu, TriggerBits hltBits)
+{
+  return triggerMenu.pass("HLT_Ele27_WPTight_Gsf_v*",hltBits);
+}
+//--------------------------------------------------------------------------------------------------
+bool ZCounting::isElectronTriggerObj(ZCountingTrigger::TTrigger triggerMenu, TriggerObjects hltMatchBits)
+{
+  return triggerMenu.passObj("HLT_Ele27_WPTight_Gsf_v*","hltEle27WPTightGsfTrackIsoFilter",hltMatchBits);
+}
 DEFINE_FWK_MODULE(ZCounting);
