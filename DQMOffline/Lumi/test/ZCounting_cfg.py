@@ -50,6 +50,15 @@ process.zcounting = cms.EDAnalyzer('ZCounting',
                                  edmName       = cms.untracked.string('muons'),
                                  edmTrackName = cms.untracked.string('generalTracks'),
 
+                                 edmGsfEleName = cms.untracked.string('gedGsfElectrons'),
+                                 edmSCName = cms.untracked.string('particleFlowEGamma'),
+
+                                 effAreasConfigFile = cms.FileInPath("RecoEgamma/ElectronIdentification/data/Summer16/effAreaElectrons_cone03_pfNeuHadronsAndPhotons_80X.txt"),
+
+                                 rhoname = cms.InputTag('fixedGridRhoFastjetAll'),
+                                 beamspotName = cms.InputTag('offlineBeamSpot'),
+                                 conversionsName = cms.InputTag('conversions'),
+
                                  IDType   = cms.untracked.string("Tight"),# Tight, Medium, Loose
                                  IsoType  = cms.untracked.string("NULL"),  # Tracker-based, PF-based
                                  IsoCut   = cms.untracked.double(0.),     # {0.05, 0.10} for Tracker-based, {0.15, 0.25} for PF-based
