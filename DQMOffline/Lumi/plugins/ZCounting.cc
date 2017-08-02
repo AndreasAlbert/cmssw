@@ -491,6 +491,103 @@ void ZCounting::analyzeElectrons(const edm::Event& iEvent, const edm::EventSetup
   edm::Handle<reco::ConversionCollection> conversionsHandle;
   iEvent.getByToken(fConversionToken, conversionsHandle);
   EleID_.setConversions(conversionsHandle);
+
+  TLorentzVector vTag(0.,0.,0.,0.);
+  TLorentzVector vProbe(0.,0.,0.,0.);
+  TLorentzVector vDilep(0.,0.,0.,0.);
+  edm::Ptr<reco::GsfElectron> eleProbe;
+  int n_good = 0;
+  int n_before_trigger = 0;
+  enum { eEleEle2HLT=1, eEleEle1HLT1L1, eEleEle1HLT, eEleEleNoSel, eEleSC };  // event category enum
+
+  int n_tag(0),n_probe(0),n_z(0);
+
+  // Loop over Tags
+  for (size_t itag = 0; itag < electrons->size(); ++itag){
+    const auto el1 = electrons->ptrAt(itag);
+    if( not EleID_.passID(el1) ) continue;
+
+    float pt1  = el1->pt();
+    float eta1 = el1->eta();
+    float phi1 = el1->phi();
+
+    n_before_trigger++;
+    if(!isElectronTriggerObj(*fTrigger, TriggerTools::matchHLT(eta1, phi1, fTrigger->fRecords, *hTrgEvt))) continue;
+    n_good++;
+    vTag.SetPtEtaPhiM(pt1, eta1, phi1, ELECTRON_MASS);
+
+    // Tag selection: kinematic cuts, lepton selection and trigger matching
+    double tag_pt = vTag.Pt();
+    double tag_abseta = fabs(vTag.Eta());
+    if(tag_pt < ELE_PT_CUT_TAG)  continue;
+    if(tag_abseta > ELE_ETA_CUT_TAG) continue;
+    if( ( tag_abseta > ELE_ETA_CRACK_LOW ) and ( tag_abseta < ELE_ETA_CRACK_HIGH ) ) continue;
+
+    // Good Tag found!
+    n_tag++;
+
+    // Loop over probes
+    for (size_t iprobe = 0; iprobe < superclusters->size(); ++iprobe){
+      // Initialize probe
+      const auto sc = superclusters->ptrAt(iprobe);
+      if(*sc == *(el1->superCluster())) {
+        continue;
+      }
+
+      // Find matching electron
+      for (size_t iele = 0; iele < electrons->size(); ++iele){
+        if(iele == itag) continue;
+        const auto ele = electrons->ptrAt(iele);
+        if(*sc == *(ele->superCluster())) {
+          eleProbe = ele;
+          //~ std::cout << "FOUND" << std::endl;
+          break;
+        }
+      }
+
+      // Assign final probe 4-vector
+      if(eleProbe.isNonnull()){
+        //TODO: SELECTION
+        vProbe.SetPtEtaPhiM( eleProbe->pt(), eleProbe->eta(), eleProbe->phi(), ELECTRON_MASS);
+      } else {
+        double pt = sc->energy() * TMath::Sqrt( 1 - pow(TMath::TanH(sc->eta()),2) );
+        vProbe.SetPtEtaPhiM( pt, sc->eta(), sc->phi(), ELECTRON_MASS);
+      }
+
+      double probe_pt = vProbe.Pt();
+      double probe_abseta = fabs(sc->eta());
+      if(probe_pt < ELE_PT_CUT_PROBE)  continue;
+      if(probe_abseta > ELE_ETA_CUT_PROBE) continue;
+      if( ( probe_abseta > ELE_ETA_CRACK_LOW ) and ( probe_abseta < ELE_ETA_CRACK_HIGH ) ) continue;
+      // Good Probe found!
+      n_probe++;
+
+      // Require good Z
+      vDilep = vTag + vProbe;
+      float MASS_LOW = 80.0;
+      float MASS_HIGH = 100.0;
+      if((vDilep.M()<MASS_LOW) || (vDilep.M()>MASS_HIGH)) continue;
+      if(eleProbe.isNonnull() and (eleProbe->charge() != - el1->charge())) continue;
+
+      // Good Z found!
+      n_z++;
+
+      long ls = iEvent.luminosityBlock();
+
+      if(isElectronTriggerObj(*fTrigger, TriggerTools::matchHLT(vProbe.Eta(), vProbe.Phi(), fTrigger->fRecords, *hTrgEvt))) {
+            h_ee_mass_HLT_pass->Fill(ls, vDilep.M());
+            if(eleProbe.isNonnull() and EleID_.passID(eleProbe)) {
+              h_ee_mass_id_pass->Fill(ls, vDilep.M());
+            } else {
+              h_ee_mass_id_fail->Fill(ls, vDilep.M());
+            }
+      } else {
+            h_ee_mass_HLT_fail->Fill(ls, vDilep.M());
+      }
+
+    } // End of probe loop
+  }//End of tag loop
+
 }
 //
 // -------------------------------------- endLuminosityBlock --------------------------------------------
