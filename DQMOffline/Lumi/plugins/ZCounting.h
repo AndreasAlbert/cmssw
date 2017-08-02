@@ -59,6 +59,7 @@ protected:
 private:
   //other functions
   void analyzeMuons(edm::Event const& e, edm::EventSetup const& eSetup);
+  void analyzeElectrons(edm::Event const& e, edm::EventSetup const& eSetup);
   bool isMuonTrigger(const ZCountingTrigger::TTrigger &triggerMenu, const TriggerBits &hltBits);
   bool isMuonTriggerObj(const ZCountingTrigger::TTrigger &triggerMenu, const TriggerObjects &hltMatchBits);
   bool passMuonID(const reco::Muon& muon, const reco::Vertex& vtx, const MuonIDTypes &idType);
@@ -114,7 +115,7 @@ private:
   const double MUON_MASS  = 0.105658369;
   const double MUON_BOUND = 0.9;
 
-  // Histograms
+  // Muon Histograms
   MonitorElement* h_mass_HLT_pass_central;
   MonitorElement* h_mass_HLT_pass_forward;
   MonitorElement* h_mass_HLT_fail_central;
@@ -132,6 +133,15 @@ private:
 
   MonitorElement* h_npv;
   MonitorElement* h_yield_Z;
+
+  // Electron Histograms
+  MonitorElement* h_ee_mass_id_pass;
+  MonitorElement* h_ee_mass_id_fail;
+
+  MonitorElement* h_ee_mass_HLT_pass;
+  MonitorElement* h_ee_mass_HLT_fail;
+
+  MonitorElement* h_ee_yield_Z;
 };
 
 
