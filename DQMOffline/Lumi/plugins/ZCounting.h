@@ -58,6 +58,7 @@ protected:
 
 private:
   //other functions
+  void analyzeMuons(edm::Event const& e, edm::EventSetup const& eSetup);
   bool isMuonTrigger(const ZCountingTrigger::TTrigger &triggerMenu, const TriggerBits &hltBits);
   bool isMuonTriggerObj(const ZCountingTrigger::TTrigger &triggerMenu, const TriggerObjects &hltMatchBits);
   bool passMuonID(const reco::Muon& muon, const reco::Vertex& vtx, const MuonIDTypes &idType);
