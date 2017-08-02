@@ -38,7 +38,7 @@ namespace edm {
 namespace ZCountingTrigger {
   class TTrigger;
 }
- 
+
 class ZCounting: public DQMEDAnalyzer{
 
 public:
@@ -48,7 +48,7 @@ public:
 
   enum MuonIDTypes  { NoneID, LooseID, MediumID, TightID };
   enum MuonIsoTypes { NoneIso, TrackerIso, PFIso };
-  
+ 
 protected:
 
   void dqmBeginRun(edm::Run const &, edm::EventSetup const &) override;
