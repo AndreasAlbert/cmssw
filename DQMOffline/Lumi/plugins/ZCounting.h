@@ -65,6 +65,9 @@ private:
   bool passMuonID(const reco::Muon& muon, const reco::Vertex& vtx, const MuonIDTypes &idType);
   bool passMuonIso(const reco::Muon& muon, const MuonIsoTypes &isoType, const float isoCut);
 
+  // Electron-specific functions
+  bool isElectronTrigger(ZCountingTrigger::TTrigger triggerMenu, TriggerBits hltBits);
+  bool isElectronTriggerObj(ZCountingTrigger::TTrigger triggerMenu, TriggerObjects hltMatchBits);
   // initialization from HLT menu; needs to be called on every change in HLT menu
   void initHLT(const edm::TriggerResults&, const edm::TriggerNames&);
 
