@@ -662,11 +662,11 @@ bool ZCounting::passMuonIso(const reco::Muon& muon, const MuonIsoTypes &isoType,
 //--------------------------------------------------------------------------------------------------
 bool ZCounting::isElectronTrigger(ZCountingTrigger::TTrigger triggerMenu, TriggerBits hltBits)
 {
-  return triggerMenu.pass("HLT_Ele27_WPTight_Gsf_v*",hltBits);
+  return triggerMenu.pass("HLT_Ele35_WPTight_Gsf_v*",hltBits);
 }
 //--------------------------------------------------------------------------------------------------
 bool ZCounting::isElectronTriggerObj(ZCountingTrigger::TTrigger triggerMenu, TriggerObjects hltMatchBits)
 {
-  return triggerMenu.passObj("HLT_Ele27_WPTight_Gsf_v*","hltEle27WPTightGsfTrackIsoFilter",hltMatchBits);
+  return triggerMenu.passObj("HLT_Ele35_WPTight_Gsf_v*","hltEle35noerWPTightGsfTrackIsoFilter",hltMatchBits);
 }
 DEFINE_FWK_MODULE(ZCounting);
