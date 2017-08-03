@@ -141,8 +141,8 @@ private:
 
   const Double_t ELECTRON_MASS  = 0.000511;
 
-  const Double_t ELE_PT_CUT_TAG = 40;
-  const Double_t ELE_PT_CUT_PROBE = 35;
+  const Double_t ELE_PT_CUT_TAG = 45;
+  const Double_t ELE_PT_CUT_PROBE = 40;
   const Double_t ELE_ETA_CUT_TAG = 2.5;
   const Double_t ELE_ETA_CUT_PROBE = 2.5;
 
