@@ -29,10 +29,17 @@ ZCounting::ZCounting(const edm::ParameterSet& iConfig):
   fMuonName          (iConfig.getUntrackedParameter<std::string>("edmName","muons")),
   fTrackName         (iConfig.getUntrackedParameter<std::string>("edmTrackName","generalTracks")),
 
+
+  fElectronName( iConfig.getUntrackedParameter<std::string>("edmGsfEleName","gedGsfElectrons")),
+  fSCName( iConfig.getUntrackedParameter<std::string>("edmSCName","particleFlowEGamma")),
+
+  fRhoTag( iConfig.getParameter<edm::InputTag>("rhoname") ),
+  fBeamspotTag(iConfig.getParameter<edm::InputTag>("beamspotName") ),
+  fConversionTag( iConfig.getParameter<edm::InputTag>("conversionsName")),
   EleID_( ElectronIdentifier(iConfig))
 {
   edm::LogInfo("ZCounting") <<  "Constructor  ZCounting::ZCounting " << std::endl;
- 
+
   //Get parameters from configuration file
   fHLTTag_token    = consumes<edm::TriggerResults>(fHLTTag);
   fHLTObjTag_token = consumes<trigger::TriggerEvent>(fHLTObjTag);
