@@ -437,7 +437,6 @@ void ZCounting::analyzeElectrons(const edm::Event& iEvent, const edm::EventSetup
   if(!hVertexProduct.isValid()) return;
 
   const reco::VertexCollection *pvCol = hVertexProduct.product();
-  //~ const reco::Vertex* pv = &(*pvCol->begin());
   int nvtx = 0;
 
   for(reco::VertexCollection::const_iterator itVtx = pvCol->begin(); itVtx!=pvCol->end(); ++itVtx) {
@@ -449,8 +448,6 @@ void ZCounting::analyzeElectrons(const edm::Event& iEvent, const edm::EventSetup
 
     nvtx++;
   }
-
-  h_npv->Fill(iEvent.luminosityBlock(), nvtx);
 
   // Good vertex requirement
   if(nvtx==0) return;
