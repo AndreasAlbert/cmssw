@@ -29,13 +29,21 @@ ZCounting::ZCounting(const edm::ParameterSet& iConfig):
   fMuonName          (iConfig.getUntrackedParameter<std::string>("edmName","muons")),
   fTrackName         (iConfig.getUntrackedParameter<std::string>("edmTrackName","generalTracks")),
 
-
+  // Electron-specific Parameters
   fElectronName( iConfig.getUntrackedParameter<std::string>("edmGsfEleName","gedGsfElectrons")),
   fSCName( iConfig.getUntrackedParameter<std::string>("edmSCName","particleFlowEGamma")),
 
+  // Electron-specific Tags
   fRhoTag( iConfig.getParameter<edm::InputTag>("rhoname") ),
   fBeamspotTag(iConfig.getParameter<edm::InputTag>("beamspotName") ),
   fConversionTag( iConfig.getParameter<edm::InputTag>("conversionsName")),
+
+  // Electron-specific Cuts
+  ELE_PT_CUT_TAG(iConfig.getUntrackedParameter<double>("PtCutEleTag")),
+  ELE_PT_CUT_PROBE(iConfig.getUntrackedParameter<double>("PtCutEleProbe")),
+  ELE_ETA_CUT_TAG(iConfig.getUntrackedParameter<double>("EtaCutEleTag")),
+  ELE_ETA_CUT_PROBE(iConfig.getUntrackedParameter<double>("EtaCutEleProbe")),
+
   EleID_( ElectronIdentifier(iConfig))
 {
   edm::LogInfo("ZCounting") <<  "Constructor  ZCounting::ZCounting " << std::endl;
@@ -54,7 +62,7 @@ ZCounting::ZCounting(const edm::ParameterSet& iConfig):
   fBeamspotToken          = consumes<reco::BeamSpot>(fBeamspotTag);
   fConversionToken        = consumes<reco::ConversionCollection>(fConversionTag);
 
-  //Cuts
+  // Muon-specific Cuts
   IDTypestr_       = iConfig.getUntrackedParameter<std::string>("IDType");
   IsoTypestr_      = iConfig.getUntrackedParameter<std::string>("IsoType");
   IsoCut_          = iConfig.getUntrackedParameter<double>("IsoCut");
