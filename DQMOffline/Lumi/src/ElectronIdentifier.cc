@@ -151,10 +151,9 @@ float ElectronIdentifier::isolation(const reco::GsfElectronPtr& ele) {
 }
 
 
-bool ElectronIdentifier::passID(const reco::GsfElectronPtr& ele) {
+bool ElectronIdentifier::passID(const reco::GsfElectronPtr& ele, std::string ID) {
 
    std::string region = fabs(ele->superCluster()->eta()) < 1.479 ? "BARREL" : "ENDCAP";
-   std::string ID = "TIGHT";
 
    bool pass = true;
 
@@ -168,12 +167,9 @@ bool ElectronIdentifier::passID(const reco::GsfElectronPtr& ele) {
    passes.push_back( (ele->gsfTrack()->hitPattern().numberOfHits(reco::HitPattern::MISSING_INNER_HITS)) <= cuts_["MISSINGHITS"][ID][region]);
    passes.push_back( !ConversionTools::hasMatchedConversion(*ele,conversions_,beamspot_->position()));
 
-   //~ std::cout<< "ID: " << ele->pt();
    for (auto const p:passes) {
-      //~ std::cout << " " << p;
       pass &= p;
    }
-   //~ std::cout << std::endl;
    return pass;
 }
 
