@@ -15,7 +15,6 @@
 #include "RecoEgamma/ElectronIdentification/plugins/cuts/GsfEleMissingHitsCut.cc"
 #include "RecoEgamma/EgammaTools/interface/ConversionTools.h"
 
-//~ #include "DQMOffline/Lumi/interface/MiniBaconDefs.h"
 #include "DQMOffline/Lumi/interface/TTrigger.h"
 #include "DQMOffline/Lumi/interface/TriggerTools.h"
 
@@ -23,9 +22,6 @@
 #include <TLorentzVector.h>
 #include <TMath.h>
 #include <algorithm>
-
-
-
 
 ElectronIdentifier::ElectronIdentifier (const edm::ParameterSet& c) :
    _effectiveAreas( (c.getParameter<edm::FileInPath>("effAreasConfigFile")).fullPath())
