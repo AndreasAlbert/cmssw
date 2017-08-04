@@ -31,7 +31,7 @@ class ElectronIdentifier{
    public:
       ElectronIdentifier (const edm::ParameterSet& c);
       float dEtaInSeed(const reco::GsfElectronPtr& ele);
-      bool passID(const reco::GsfElectronPtr& ele);
+      bool passID(const reco::GsfElectronPtr& ele, std::string ID);
       float isolation(const reco::GsfElectronPtr& ele);
       void loadEvent(const edm::Event& iEvent);
 
