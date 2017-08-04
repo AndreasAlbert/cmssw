@@ -23,10 +23,9 @@ using namespace ZCountingTrigger;
 // be associated with the same leg (e.g. the trailing electron in a dielectron trigger)
 //
 TTrigger::TTrigger() { 
-
   fRecords.push_back(ZCountingTrigger::TriggerRecord("HLT_IsoMu27_v*",0));
   fRecords.back().objectMap.push_back(std::pair<std::string, int>("hltL3crIsoL1sMu22Or25L1f0L2f10QL3f27QL3trkIsoFiltered0p07",0));    
-  fRecords.push_back(ZCountingTrigger::TriggerRecord("HLT_Ele35_WPTight_Gsf_v*",0));
+  fRecords.push_back(ZCountingTrigger::TriggerRecord("HLT_Ele35_WPTight_Gsf_v*",1));
   fRecords.back().objectMap.push_back(std::pair<std::string, int>("hltEle35noerWPTightGsfTrackIsoFilter",0));
 }
 
