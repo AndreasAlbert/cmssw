@@ -73,6 +73,8 @@ process.zcounting = cms.EDAnalyzer('ZCounting',
                                  EtaCutEleTag = cms.untracked.double(2.5),
                                  EtaCutEleProbe = cms.untracked.double(2.5),
 
+                                 ElectronIDType = cms.untracked.string("TIGHT"),
+
                                  MassBin  = cms.untracked.int32(50),
                                  MassMin  = cms.untracked.double(66.0),
                                  MassMax  = cms.untracked.double(116.0),
