@@ -38,10 +38,7 @@ class ElectronIdentifier{
       void setRho(double rho);
       void setBeamspot(edm::Handle<reco::BeamSpot> beamspot);
       void setConversions(edm::Handle<reco::ConversionCollection> conversions);
-      //~ GsfEleEffAreaPFIsoCut isoCut;
    private:
-     //~ edm::InputTag fRhoTag;
-     //~ edm::EDGetTokenT<bool> fRhoToken;
      double rho_;
      edm::Handle<reco::BeamSpot> beamspot_;
      edm::Handle<reco::ConversionCollection> conversions_;
