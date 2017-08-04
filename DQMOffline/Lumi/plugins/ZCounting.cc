@@ -45,7 +45,7 @@ ZCounting::ZCounting(const edm::ParameterSet& iConfig):
   ELE_ETA_CUT_PROBE(iConfig.getUntrackedParameter<double>("EtaCutEleProbe")),
 
   ELE_ID_WP( iConfig.getUntrackedParameter<std::string>("ElectronIDType","TIGHT")),
-  EleID_( ElectronIdentifier(iConfig))
+  EleID_(ElectronIdentifier(iConfig))
 {
   edm::LogInfo("ZCounting") <<  "Constructor  ZCounting::ZCounting " << std::endl;
 
@@ -98,6 +98,8 @@ ZCounting::ZCounting(const edm::ParameterSet& iConfig):
   VtxNdofCut_       = iConfig.getUntrackedParameter<double>("VtxNdofMin");
   VtxAbsZCut_       = iConfig.getUntrackedParameter<double>("VtxAbsZMax");
   VtxRhoCut_        = iConfig.getUntrackedParameter<double>("VtxRhoMax");
+
+  EleID_.setID(ELE_ID_WP);
 }
 
 //
@@ -521,7 +523,7 @@ void ZCounting::analyzeElectrons(const edm::Event& iEvent, const edm::EventSetup
   // Loop over Tags
   for (size_t itag = 0; itag < electrons->size(); ++itag){
     const auto el1 = electrons->ptrAt(itag);
-    if( not EleID_.passID(el1,ELE_ID_WP) ) continue;
+    if( not EleID_.passID(el1) ) continue;
 
     float pt1  = el1->pt();
     float eta1 = el1->eta();
@@ -592,7 +594,7 @@ void ZCounting::analyzeElectrons(const edm::Event& iEvent, const edm::EventSetup
 
       if(isElectronTriggerObj(*fTrigger, TriggerTools::matchHLT(vProbe.Eta(), vProbe.Phi(), fTrigger->fRecords, *hTrgEvt))) {
             h_ee_mass_HLT_pass->Fill(ls, vDilep.M());
-            if(eleProbe.isNonnull() and EleID_.passID(eleProbe,ELE_ID_WP)) {
+            if(eleProbe.isNonnull() and EleID_.passID(eleProbe)) {
               h_ee_mass_id_pass->Fill(ls, vDilep.M());
             } else {
               h_ee_mass_id_fail->Fill(ls, vDilep.M());

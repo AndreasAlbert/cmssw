@@ -27,8 +27,8 @@ ElectronIdentifier::ElectronIdentifier (const edm::ParameterSet& c) :
    _effectiveAreas( (c.getParameter<edm::FileInPath>("effAreasConfigFile")).fullPath())
 
 {
-      rho_ = -1;
-
+   rho_ = -1;
+   ID_ = "NULL";
    cuts_["SIGMAIETA"]["VETO"]  ["BARREL"] = 0.0115;
    cuts_["SIGMAIETA"]["LOOSE"] ["BARREL"] = 0.011;
    cuts_["SIGMAIETA"]["MEDIUM"]["BARREL"] = 0.00998;
@@ -117,6 +117,21 @@ void ElectronIdentifier::setRho(double rho) {
       throw;
    }
 }
+void ElectronIdentifier::setID(std::string ID) {
+   bool is_available = true;
+   for (auto const cutmap : cuts_) {
+      bool tmp = false;
+      for( auto const item : cutmap.second ){
+            tmp |= (item.first == ID);
+      }
+      is_available &= tmp;
+   }
+   if(is_available){
+      ID_ = ID;
+   } else {
+      throw;
+   }
+}
 void ElectronIdentifier::setBeamspot(edm::Handle<reco::BeamSpot> beamspot) {
    beamspot_ = beamspot;
 }
@@ -147,20 +162,20 @@ float ElectronIdentifier::isolation(const reco::GsfElectronPtr& ele) {
 }
 
 
-bool ElectronIdentifier::passID(const reco::GsfElectronPtr& ele, std::string ID) {
-
+bool ElectronIdentifier::passID(const reco::GsfElectronPtr& ele) {
+   if(ID_ == "NULL") throw;
    std::string region = fabs(ele->superCluster()->eta()) < 1.479 ? "BARREL" : "ENDCAP";
 
    bool pass = true;
 
    std::vector<bool> passes;
-   passes.push_back( ele->full5x5_sigmaIetaIeta()                     < cuts_["SIGMAIETA"][ID][region]);
-   passes.push_back( dEtaInSeed(ele)                                  < cuts_["DETAINSEED"][ID][region]);
-   passes.push_back( std::abs(ele->deltaPhiSuperClusterTrackAtVtx())  < cuts_["DPHIIN"][ID][region]);
-   passes.push_back( ele->hadronicOverEm()                            < cuts_["HOVERE"][ID][region]);
-   passes.push_back( isolation(ele)                                   < cuts_["ISO"][ID][region]);
-   passes.push_back( std::abs(1.0 - ele->eSuperClusterOverP())/ele->ecalEnergy()  < cuts_["1OVERE"][ID][region]);
-   passes.push_back( (ele->gsfTrack()->hitPattern().numberOfHits(reco::HitPattern::MISSING_INNER_HITS)) <= cuts_["MISSINGHITS"][ID][region]);
+   passes.push_back( ele->full5x5_sigmaIetaIeta()                     < cuts_["SIGMAIETA"][ID_][region]);
+   passes.push_back( dEtaInSeed(ele)                                  < cuts_["DETAINSEED"][ID_][region]);
+   passes.push_back( std::abs(ele->deltaPhiSuperClusterTrackAtVtx())  < cuts_["DPHIIN"][ID_][region]);
+   passes.push_back( ele->hadronicOverEm()                            < cuts_["HOVERE"][ID_][region]);
+   passes.push_back( isolation(ele)                                   < cuts_["ISO"][ID_][region]);
+   passes.push_back( std::abs(1.0 - ele->eSuperClusterOverP())/ele->ecalEnergy()  < cuts_["1OVERE"][ID_][region]);
+   passes.push_back( (ele->gsfTrack()->hitPattern().numberOfHits(reco::HitPattern::MISSING_INNER_HITS)) <= cuts_["MISSINGHITS"][ID_][region]);
    passes.push_back( !ConversionTools::hasMatchedConversion(*ele,conversions_,beamspot_->position()));
 
    for (auto const p:passes) {
