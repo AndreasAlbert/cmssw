@@ -1,5 +1,5 @@
-#ifndef ElectronIdentifier_H
-#define ElectronIdentifier_H
+#ifndef DQMOFFLINE_LUMI_ELECTRONIDENTIFIER_H
+#define DQMOFFLINE_LUMI_ELECTRONIDENTIFIER_H
 
 #include "FWCore/Framework/interface/MakerMacros.h"      // definitions for declaring plug-in modules
 #include "FWCore/Framework/interface/Frameworkfwd.h"     // declaration of EDM types
@@ -21,8 +21,6 @@
 #include "DataFormats/EgammaCandidates/interface/GsfElectron.h"
 
 #include "PhysicsTools/SelectorUtils/interface/CutApplicatorBase.h"
-
-#include "RecoEgamma/ElectronIdentification/plugins/cuts/GsfEleEffAreaPFIsoCut.cc"
 
 #include "RecoEgamma/EgammaTools/interface/EffectiveAreas.h"
 #include <DataFormats/BeamSpot/interface/BeamSpot.h>
