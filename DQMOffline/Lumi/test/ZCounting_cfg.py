@@ -31,7 +31,8 @@ from CondCore.CondDB.CondDB_cfi import *
 process.maxEvents = cms.untracked.PSet( input = cms.untracked.int32(1000) )
 process.source = cms.Source("PoolSource",
                                 fileNames = cms.untracked.vstring(
-'/store/data/Run2017B/SingleMuon/RECO/PromptReco-v1/000/297/218/00000/14C84999-6457-E711-AAE4-02163E0136E0.root'
+                                # '/store/data/Run2017B/SingleMuon/RECO/PromptReco-v1/000/297/218/00000/14C84999-6457-E711-AAE4-02163E0136E0.root',
+                                '/store/data/Run2017C/SingleElectron/RECO/PromptReco-v2/000/300/237/00000/004998A7-1578-E711-B7FA-02163E01A400.root'
                                 )
                                 )
 process.source.inputCommands = cms.untracked.vstring("keep *",
