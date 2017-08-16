@@ -588,6 +588,7 @@ void ZCounting::analyzeElectrons(const edm::Event& iEvent, const edm::EventSetup
       // Good Z found!
       n_z++;
 
+      long ls = iEvent.luminosityBlock();
       bool probe_pass_trigger = isElectronTriggerObj(*fTrigger, TriggerTools::matchHLT(vProbe.Eta(), vProbe.Phi(), fTrigger->fRecords, *hTrgEvt));
       bool probe_pass_id = eleProbe.isNonnull() and EleID_.passID(eleProbe);
 
