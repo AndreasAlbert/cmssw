@@ -158,7 +158,7 @@ void ZCounting::bookHistograms(DQMStore::IBooker & ibooker_, edm::Run const &, e
 
   h_ee_mass_HLT_pass = ibooker_.book2D("h_ee_mass_HLT_pass", "h_ee_mass_HLT_pass", LumiBin_, LumiMin_, LumiMax_, MassBin_, MassMin_, MassMax_);
   h_ee_mass_HLT_fail = ibooker_.book2D("h_ee_mass_HLT_fail", "h_ee_mass_HLT_fail", LumiBin_, LumiMin_, LumiMax_, MassBin_, MassMin_, MassMax_);
-  h_ee_yield_Z     = ibooker_.book1D("h_yield_Zee", "h_yield_Zee", LumiBin_, LumiMin_, LumiMax_);
+  h_ee_yield_Z     = ibooker_.book1D("h_ee_yield_Z", "h_ee_yield_Z", LumiBin_, LumiMin_, LumiMax_);
 }
 //
 // -------------------------------------- beginLuminosityBlock --------------------------------------------
@@ -588,6 +588,7 @@ void ZCounting::analyzeElectrons(const edm::Event& iEvent, const edm::EventSetup
       n_z++;
 
       long ls = iEvent.luminosityBlock();
+      h_ee_yield_Z->Fill(ls);
 
       if(isElectronTriggerObj(*fTrigger, TriggerTools::matchHLT(vProbe.Eta(), vProbe.Phi(), fTrigger->fRecords, *hTrgEvt))) {
             h_ee_mass_HLT_pass->Fill(ls, vDilep.M());
