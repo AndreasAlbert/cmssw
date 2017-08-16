@@ -172,7 +172,7 @@ bool ElectronIdentifier::passID(const reco::GsfElectronPtr& ele) {
    passes.push_back( dEtaInSeed(ele)                                  < cuts_["DETAINSEED"][ID_][region]);
    passes.push_back( std::abs(ele->deltaPhiSuperClusterTrackAtVtx())  < cuts_["DPHIIN"][ID_][region]);
    passes.push_back( ele->hadronicOverEm()                            < cuts_["HOVERE"][ID_][region]);
-   passes.push_back( isolation(ele)                                   < cuts_["ISO"][ID_][region]);
+   passes.push_back( isolation(ele)/ele->pt()                         < cuts_["ISO"][ID_][region]);
    passes.push_back( std::abs(1.0 - ele->eSuperClusterOverP())/ele->ecalEnergy()  < cuts_["1OVERE"][ID_][region]);
    passes.push_back( (ele->gsfTrack()->hitPattern().numberOfHits(reco::HitPattern::MISSING_INNER_HITS)) <= cuts_["MISSINGHITS"][ID_][region]);
    passes.push_back( !ConversionTools::hasMatchedConversion(*ele,conversions_,beamspot_->position()));
