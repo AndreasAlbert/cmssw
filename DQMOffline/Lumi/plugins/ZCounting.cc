@@ -153,12 +153,13 @@ void ZCounting::bookHistograms(DQMStore::IBooker & ibooker_, edm::Run const &, e
 
 
   // Electron histograms
-  h_ee_mass_id_pass = ibooker_.book2D("h_ee_mass_id_pass", "h_ee_mass_id_pass", LumiBin_, LumiMin_, LumiMax_, MassBin_, MassMin_, MassMax_);
-  h_ee_mass_id_fail = ibooker_.book2D("h_ee_mass_id_fail", "h_ee_mass_id_fail", LumiBin_, LumiMin_, LumiMax_, MassBin_, MassMin_, MassMax_);
+  h_ee_mass_id_pass  = ibooker_.book2D("h_ee_mass_id_pass", "h_ee_mass_id_pass", LumiBin_, LumiMin_, LumiMax_, MassBin_, MassMin_, MassMax_);
+  h_ee_mass_id_fail  = ibooker_.book2D("h_ee_mass_id_fail", "h_ee_mass_id_fail", LumiBin_, LumiMin_, LumiMax_, MassBin_, MassMin_, MassMax_);
 
   h_ee_mass_HLT_pass = ibooker_.book2D("h_ee_mass_HLT_pass", "h_ee_mass_HLT_pass", LumiBin_, LumiMin_, LumiMax_, MassBin_, MassMin_, MassMax_);
   h_ee_mass_HLT_fail = ibooker_.book2D("h_ee_mass_HLT_fail", "h_ee_mass_HLT_fail", LumiBin_, LumiMin_, LumiMax_, MassBin_, MassMin_, MassMax_);
-  h_ee_yield_Z     = ibooker_.book1D("h_ee_yield_Z", "h_ee_yield_Z", LumiBin_, LumiMin_, LumiMax_);
+
+  h_ee_yield_Z       = ibooker_.book1D("h_ee_yield_Z", "h_ee_yield_Z", LumiBin_, LumiMin_, LumiMax_);
 }
 //
 // -------------------------------------- beginLuminosityBlock --------------------------------------------
