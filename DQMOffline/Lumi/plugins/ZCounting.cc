@@ -588,20 +588,23 @@ void ZCounting::analyzeElectrons(const edm::Event& iEvent, const edm::EventSetup
       // Good Z found!
       n_z++;
 
-      long ls = iEvent.luminosityBlock();
-      h_ee_yield_Z->Fill(ls);
+      bool probe_pass_trigger = isElectronTriggerObj(*fTrigger, TriggerTools::matchHLT(vProbe.Eta(), vProbe.Phi(), fTrigger->fRecords, *hTrgEvt));
+      bool probe_pass_id = eleProbe.isNonnull() and EleID_.passID(eleProbe);
 
-      if(isElectronTriggerObj(*fTrigger, TriggerTools::matchHLT(vProbe.Eta(), vProbe.Phi(), fTrigger->fRecords, *hTrgEvt))) {
-            h_ee_mass_HLT_pass->Fill(ls, vDilep.M());
-            if(eleProbe.isNonnull() and EleID_.passID(eleProbe)) {
-              h_ee_mass_id_pass->Fill(ls, vDilep.M());
-            } else {
-              h_ee_mass_id_fail->Fill(ls, vDilep.M());
-            }
+      /// Fill for ID efficiency and yields
+      if(probe_pass_id) {
+        h_ee_mass_id_pass->Fill(ls, vDilep.M());
+        h_ee_yield_Z->Fill(ls);
       } else {
-            h_ee_mass_HLT_fail->Fill(ls, vDilep.M());
+        h_ee_mass_id_fail->Fill(ls, vDilep.M());
       }
 
+      /// Fill for HLT efficiency
+      if(probe_pass_id and probe_pass_trigger) {
+        h_ee_mass_HLT_pass->Fill(ls, vDilep.M());
+      } else if (probe_pass_id) {
+        h_ee_mass_HLT_fail->Fill(ls, vDilep.M());
+      }
     } // End of probe loop
   }//End of tag loop
 
