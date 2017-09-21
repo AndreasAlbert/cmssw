@@ -71,8 +71,8 @@ process.zcounting = cms.EDAnalyzer('ZCounting',
                                  EtaCutL1 = cms.untracked.double(2.4),
                                  EtaCutL2 = cms.untracked.double(2.4),
 
-                                 PtCutEleTag = cms.untracked.double(45.0),
-                                 PtCutEleProbe = cms.untracked.double(40.0),
+                                 PtCutEleTag = cms.untracked.double(40.0),
+                                 PtCutEleProbe = cms.untracked.double(35.0),
                                  EtaCutEleTag = cms.untracked.double(2.5),
                                  EtaCutEleProbe = cms.untracked.double(2.5),
 
@@ -83,8 +83,8 @@ process.zcounting = cms.EDAnalyzer('ZCounting',
                                  MassMax  = cms.untracked.double(116.0),
 
                                  LumiBin  = cms.untracked.int32(2500),
-                                 LumiMin  = cms.untracked.double(0.0),
-                                 LumiMax  = cms.untracked.double(2500.0),
+                                 LumiMin  = cms.untracked.double(-0.5),
+                                 LumiMax  = cms.untracked.double(2499.5),
 
                                  PVBin    = cms.untracked.int32(60),
                                  PVMin    = cms.untracked.double(0.0),
