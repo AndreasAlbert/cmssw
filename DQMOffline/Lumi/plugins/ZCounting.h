@@ -69,6 +69,9 @@ private:
   // Electron-specific functions
   bool isElectronTrigger(ZCountingTrigger::TTrigger triggerMenu, TriggerBits hltBits);
   bool isElectronTriggerObj(ZCountingTrigger::TTrigger triggerMenu, TriggerObjects hltMatchBits);
+  bool ele_probe_selection(double pt, double abseta);
+  bool ele_tag_selection(double pt, double abseta);
+
   // initialization from HLT menu; needs to be called on every change in HLT menu
   void initHLT(const edm::TriggerResults&, const edm::TriggerNames&);
 
@@ -172,13 +175,20 @@ private:
   MonitorElement* h_yield_Z;
 
   // Electron Histograms
-  MonitorElement* h_ee_mass_id_pass;
-  MonitorElement* h_ee_mass_id_fail;
+  MonitorElement* h_ee_mass_id_pass_central;
+  MonitorElement* h_ee_mass_id_fail_central;
+  MonitorElement* h_ee_mass_id_pass_forward;
+  MonitorElement* h_ee_mass_id_fail_forward;
 
-  MonitorElement* h_ee_mass_HLT_pass;
-  MonitorElement* h_ee_mass_HLT_fail;
+  MonitorElement* h_ee_mass_HLT_pass_central;
+  MonitorElement* h_ee_mass_HLT_fail_central;
+  MonitorElement* h_ee_mass_HLT_pass_forward;
+  MonitorElement* h_ee_mass_HLT_fail_forward;
 
-  MonitorElement* h_ee_yield_Z;
+
+  MonitorElement * h_ee_yield_Z_ebeb;
+  MonitorElement * h_ee_yield_Z_ebee;
+  MonitorElement * h_ee_yield_Z_eeee;
 };
 
 
