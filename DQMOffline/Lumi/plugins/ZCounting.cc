@@ -153,13 +153,20 @@ void ZCounting::bookHistograms(DQMStore::IBooker & ibooker_, edm::Run const &, e
 
 
   // Electron histograms
-  h_ee_mass_id_pass  = ibooker_.book2D("h_ee_mass_id_pass", "h_ee_mass_id_pass", LumiBin_, LumiMin_, LumiMax_, MassBin_, MassMin_, MassMax_);
-  h_ee_mass_id_fail  = ibooker_.book2D("h_ee_mass_id_fail", "h_ee_mass_id_fail", LumiBin_, LumiMin_, LumiMax_, MassBin_, MassMin_, MassMax_);
+  h_ee_mass_id_pass_central  = ibooker_.book2D("h_ee_mass_id_pass_central", "h_ee_mass_id_pass_central", LumiBin_, LumiMin_, LumiMax_, MassBin_, MassMin_, MassMax_);
+  h_ee_mass_id_fail_central  = ibooker_.book2D("h_ee_mass_id_fail_central", "h_ee_mass_id_fail_central", LumiBin_, LumiMin_, LumiMax_, MassBin_, MassMin_, MassMax_);
+  h_ee_mass_id_pass_forward  = ibooker_.book2D("h_ee_mass_id_pass_forward", "h_ee_mass_id_pass_forward", LumiBin_, LumiMin_, LumiMax_, MassBin_, MassMin_, MassMax_);
+  h_ee_mass_id_fail_forward  = ibooker_.book2D("h_ee_mass_id_fail_forward", "h_ee_mass_id_fail_forward", LumiBin_, LumiMin_, LumiMax_, MassBin_, MassMin_, MassMax_);
 
-  h_ee_mass_HLT_pass = ibooker_.book2D("h_ee_mass_HLT_pass", "h_ee_mass_HLT_pass", LumiBin_, LumiMin_, LumiMax_, MassBin_, MassMin_, MassMax_);
-  h_ee_mass_HLT_fail = ibooker_.book2D("h_ee_mass_HLT_fail", "h_ee_mass_HLT_fail", LumiBin_, LumiMin_, LumiMax_, MassBin_, MassMin_, MassMax_);
+  h_ee_mass_HLT_pass_central = ibooker_.book2D("h_ee_mass_HLT_pass_central", "h_ee_mass_HLT_pass_central", LumiBin_, LumiMin_, LumiMax_, MassBin_, MassMin_, MassMax_);
+  h_ee_mass_HLT_fail_central = ibooker_.book2D("h_ee_mass_HLT_fail_central", "h_ee_mass_HLT_fail_central", LumiBin_, LumiMin_, LumiMax_, MassBin_, MassMin_, MassMax_);
+  h_ee_mass_HLT_pass_forward = ibooker_.book2D("h_ee_mass_HLT_pass_forward", "h_ee_mass_HLT_pass_forward", LumiBin_, LumiMin_, LumiMax_, MassBin_, MassMin_, MassMax_);
+  h_ee_mass_HLT_fail_forward = ibooker_.book2D("h_ee_mass_HLT_fail_forward", "h_ee_mass_HLT_fail_forward", LumiBin_, LumiMin_, LumiMax_, MassBin_, MassMin_, MassMax_);
 
-  h_ee_yield_Z       = ibooker_.book1D("h_ee_yield_Z", "h_ee_yield_Z", LumiBin_, LumiMin_, LumiMax_);
+  h_ee_yield_Z_ebeb       = ibooker_.book1D("h_ee_yield_Z_ebeb", "h_ee_yield_Z_ebeb", LumiBin_, LumiMin_, LumiMax_);
+  h_ee_yield_Z_ebee       = ibooker_.book1D("h_ee_yield_Z_ebee", "h_ee_yield_Z_ebee", LumiBin_, LumiMin_, LumiMax_);
+  h_ee_yield_Z_eeee       = ibooker_.book1D("h_ee_yield_Z_eeee", "h_ee_yield_Z_eeee", LumiBin_, LumiMin_, LumiMax_);
+  
 }
 //
 // -------------------------------------- beginLuminosityBlock --------------------------------------------
@@ -533,16 +540,16 @@ void ZCounting::analyzeElectrons(const edm::Event& iEvent, const edm::EventSetup
     n_good++;
     vTag.SetPtEtaPhiM(pt1, eta1, phi1, ELECTRON_MASS);
 
+
     // Tag selection: kinematic cuts, lepton selection and trigger matching
     double tag_pt = vTag.Pt();
     double tag_abseta = fabs(vTag.Eta());
-    if(tag_pt < ELE_PT_CUT_TAG)  continue;
-    if(tag_abseta > ELE_ETA_CUT_TAG) continue;
-    if( ( tag_abseta > ELE_ETA_CRACK_LOW ) and ( tag_abseta < ELE_ETA_CRACK_HIGH ) ) continue;
 
-    // Good Tag found!
-    n_tag++;
+    bool tag_is_valid_tag = ele_tag_selection(tag_pt,tag_abseta);
+    bool tag_is_valid_probe = ele_probe_selection(tag_pt,tag_abseta);
 
+    if( not (tag_is_valid_tag or tag_is_valid_probe) ) continue;
+  
     // Loop over probes
     for (size_t iprobe = 0; iprobe < superclusters->size(); ++iprobe){
       // Initialize probe
@@ -572,9 +579,8 @@ void ZCounting::analyzeElectrons(const edm::Event& iEvent, const edm::EventSetup
       // Probe Selection
       double probe_pt = vProbe.Pt();
       double probe_abseta = fabs(sc->eta());
-      if(probe_pt < ELE_PT_CUT_PROBE)  continue;
-      if(probe_abseta > ELE_ETA_CUT_PROBE) continue;
-      if( ( probe_abseta > ELE_ETA_CRACK_LOW ) and ( probe_abseta < ELE_ETA_CRACK_HIGH ) ) continue;
+      bool probe_is_valid_probe = ele_probe_selection(probe_pt, probe_abseta);
+      if( !probe_is_valid_probe ) continue;
 
       // Good Probe found!
       n_probe++;
@@ -593,23 +599,68 @@ void ZCounting::analyzeElectrons(const edm::Event& iEvent, const edm::EventSetup
       bool probe_pass_trigger = isElectronTriggerObj(*fTrigger, TriggerTools::matchHLT(vProbe.Eta(), vProbe.Phi(), fTrigger->fRecords, *hTrgEvt));
       bool probe_pass_id = eleProbe.isNonnull() and EleID_.passID(eleProbe);
 
-      /// Fill for ID efficiency and yields
+      //// Fill for yields
+      bool probe_is_forward = probe_abseta > ELE_ETA_CRACK_LOW;
+      bool tag_is_forward = tag_abseta > ELE_ETA_CRACK_LOW;
+
       if(probe_pass_id) {
-        h_ee_mass_id_pass->Fill(ls, vDilep.M());
-        h_ee_yield_Z->Fill(ls);
+        if(probe_is_forward and tag_is_forward) {
+          h_ee_yield_Z_eeee -> Fill(ls);
+        } else if(!probe_is_forward and !tag_is_forward) {
+          h_ee_yield_Z_ebeb -> Fill(ls);
+        } else {
+          h_ee_yield_Z_ebee -> Fill(ls);
+        }
+      }
+
+      if(!tag_is_valid_tag) continue;
+      
+      /// Fill for ID efficiency
+      if(probe_pass_id) {
+        if(probe_is_forward) {
+          h_ee_mass_id_pass_forward->Fill(ls, vDilep.M());
+        } else {
+          h_ee_mass_id_pass_central->Fill(ls, vDilep.M());
+        }
       } else {
-        h_ee_mass_id_fail->Fill(ls, vDilep.M());
+          if(probe_is_forward) {
+            h_ee_mass_id_fail_forward->Fill(ls, vDilep.M());
+          } else {
+            h_ee_mass_id_fail_central->Fill(ls, vDilep.M());
+          }
       }
 
       /// Fill for HLT efficiency
       if(probe_pass_id and probe_pass_trigger) {
-        h_ee_mass_HLT_pass->Fill(ls, vDilep.M());
+        if(probe_is_forward) {
+          h_ee_mass_HLT_pass_forward->Fill(ls, vDilep.M());
+        } else {
+          h_ee_mass_HLT_pass_central->Fill(ls, vDilep.M());
+        }
       } else if (probe_pass_id) {
-        h_ee_mass_HLT_fail->Fill(ls, vDilep.M());
+        if(probe_is_forward) {
+          h_ee_mass_HLT_fail_forward->Fill(ls, vDilep.M());
+        } else {
+          h_ee_mass_HLT_fail_central->Fill(ls, vDilep.M());
+        }
       }
     } // End of probe loop
   }//End of tag loop
 
+}
+bool ZCounting::ele_probe_selection(double pt, double abseta){
+  bool pass = true;
+  pass &= pt > ELE_PT_CUT_PROBE;
+  pass &= abseta < ELE_ETA_CUT_PROBE;
+  pass &= (abseta < ELE_ETA_CRACK_LOW) or (abseta > ELE_ETA_CRACK_HIGH);
+  return pass;
+}
+bool ZCounting::ele_tag_selection(double pt, double abseta){
+  bool pass = true;
+  pass &= pt > ELE_PT_CUT_TAG;
+  pass &= abseta < ELE_ETA_CUT_TAG;
+  pass &= (abseta < ELE_ETA_CRACK_LOW) or (abseta > ELE_ETA_CRACK_HIGH);
+  return pass;
 }
 //
 // -------------------------------------- endLuminosityBlock --------------------------------------------
